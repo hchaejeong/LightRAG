@@ -1999,6 +1999,10 @@ async def kg_query(
         chunks_vdb,
     )
 
+    # retrieval only case
+    if query_param.retrieve_only:
+        return context
+
     if query_param.only_need_context:
         return context if context is not None else PROMPTS["fail_response"]
     if context is None:
@@ -2589,6 +2593,24 @@ async def _build_query_context(
             if pair in final_relation_pairs and pair not in seen_edges:
                 final_edge_datas.append(edge)
                 seen_edges.add(pair)
+
+
+    if query_param.retrieve_only:
+        entities_str = json.dumps(final_node_datas, ensure_ascii=False)
+        relations_str = json.dumps(final_edge_datas, ensure_ascii=False)
+        context = """-----Entities(KG)-----
+
+```json
+{entities_str}
+```
+
+-----Relationships(KG)-----
+
+```json
+{relations_str}
+```
+""".format(entities_str=entities_str, relations_str=relations_str)
+        return context
 
     # Get text chunks based on final filtered data
     # To preserve the influence of entity order,  entiy-based chunks should not be deduplcicated by vector_chunks

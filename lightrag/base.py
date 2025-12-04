@@ -158,6 +158,9 @@ class QueryParam:
     Default is True to enable reranking when rerank model is available.
     """
 
+    retrieve_only: bool = False
+    """If True, only returns the retrieved context without generating a response."""
+
 
 @dataclass
 class StorageNameSpace(ABC):
